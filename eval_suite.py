@@ -16,6 +16,7 @@ import yaml
 import logging
 from typing import Dict, Any, List, Tuple
 from dataclasses import dataclass
+from datetime import datetime
 
 # Set stdout encoding for Windows console compatibility
 if hasattr(sys.stdout, "reconfigure"):
@@ -296,8 +297,62 @@ class WeatherBotEvaluator:
                 f.write(original_content)
 
 
+def write_eval_markdown(results: List[EvalResult], output_path: str = "eval_outputs.md"):
+    """Generates a detailed Markdown report and writes it to disk."""
+    total = len(results)
+    passed_count = sum(1 for r in results if r.passed)
+    score_pct = (passed_count / total) * 100 if total > 0 else 0
+
+    lines = []
+    lines.append("# MediBuddy Weather-Advisory Bot — Automated Evaluation Report")
+    lines.append("")
+    lines.append(f"> **Generated at:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  ")
+    lines.append(f"> **Summary:** **{passed_count}/{total} Test Cases Passed** ({score_pct:.1f}% Pass Rate)")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+    lines.append("## 📊 Evaluation Summary Table")
+    lines.append("")
+    lines.append("| ID | Test Case | Status | Citations / Fallback Status | Execution Trace |")
+    lines.append("| :--- | :--- | :---: | :--- | :--- |")
+
+    for r in results:
+        status_badge = "✅ **PASS**" if r.passed else "❌ **FAIL**"
+        cit_str = ", ".join([f"`{c}`" for c in r.citations]) if r.citations else f"*Fallback:* `{r.fallback_type}`"
+        trace_str = " $\\rightarrow$ ".join([f"`{t}`" for t in r.execution_trace]) if r.execution_trace else "*N/A*"
+        lines.append(f"| **{r.case_id}** | {r.name} | {status_badge} | {cit_str} | {trace_str} |")
+
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+    lines.append("## 🔍 Detailed Test Case Results")
+    lines.append("")
+
+    for r in results:
+        status_icon = "✅ PASS" if r.passed else "❌ FAIL"
+        lines.append(f"### `{r.case_id}`: {r.name} — {status_icon}")
+        lines.append("")
+        lines.append(f"- **Status:** `{r.fallback_type if r.fallback_type != 'NONE' else 'SUCCESS'}`")
+        lines.append(f"- **Citations:** {', '.join([f'`{c}`' for c in r.citations]) if r.citations else 'None'}")
+        lines.append(f"- **Execution Trace:** `{' -> '.join(r.execution_trace)}`")
+        lines.append(f"- **Validation Notes:** {'; '.join(r.reasons)}")
+        lines.append("")
+        lines.append("**Bot Response Snippet:**")
+        lines.append("```text")
+        lines.append(r.response_snippet)
+        lines.append("```")
+        lines.append("")
+        lines.append("---")
+        lines.append("")
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+    print(f"Detailed Markdown evaluation report written to: {output_path}")
+
+
 def print_eval_report(results: List[EvalResult]):
-    """Renders formatted evaluation table and metrics summary."""
+    """Renders formatted evaluation table and metrics summary to console."""
     print("\n" + "=" * 90)
     print("           MEDIBUDDY WEATHER-ADVISORY BOT - AUTOMATED EVALUATION REPORT")
     print("=" * 90)
@@ -329,3 +384,4 @@ if __name__ == "__main__":
     print("Running MediBuddy Weather-Advisory Bot Evaluation Suite...")
     eval_results = evaluator.run_all_tests()
     print_eval_report(eval_results)
+    write_eval_markdown(eval_results, output_path="eval_outputs.md")
