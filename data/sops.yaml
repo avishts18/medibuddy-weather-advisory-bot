@@ -1,0 +1,315 @@
+# ==============================================================================
+# MediBuddy Weather-Advisory Support Bot - Standard Operating Procedures (SOPs)
+# ==============================================================================
+# Format Rationale:
+# YAML format is chosen for human readability, strict data typing, non-developer
+# maintainability, and hot-reloading capability. Policy teams can add, modify,
+# or deprecate rules without touching python runtime code or control flow.
+#
+# Severities:
+#   - CRITICAL: Severe immediate hazard to life or safety. Halt activity.
+#   - HIGH: Significant hazard or major regional alert. Discourage activity strongly.
+#   - MODERATE: Notable safety concern or discomfort. Take precautionary measures.
+#   - LOW_ADVISORY: Minor comfort/prep advice. Activity is safe with standard care.
+# ==============================================================================
+
+sops:
+  # ----------------------------------------------------------------------------
+  # CATEGORY 1: REGIONAL SYNOPTIC SYSTEMS & METEOROLOGICAL EMERGENCIES (GLOBAL OVERRIDES)
+  # ----------------------------------------------------------------------------
+  - id: "SOP-SYN-001"
+    title: "Regional Low-Pressure System / Cyclonic Circulation Advisory"
+    category: "regional_emergency"
+    severity: "HIGH"
+    priority: 100
+    description: "Applies when a well-marked low-pressure system, monsoon depression, or cyclonic circulation is actively causing heavy to very heavy rainfall across a region."
+    conditions:
+      type: "compound_or"
+      rules:
+        - metric: "precipitation"
+          operator: ">="
+          value: 20.0
+          unit: "mm/h"
+        - metric: "precipitation_probability"
+          operator: ">="
+          value: 80
+          unit: "%"
+        - metric: "weather_code"
+          operator: "in"
+          value: [65, 67, 75, 82, 95, 96, 99] # Heavy rain, thunderstorm with heavy rain/hail
+      fuzzy_match:
+        context_keywords: ["monsoon", "cyclone", "low pressure", "depression", "flood", "torrential", "heavy rainfall"]
+    applies_to_activities: ["*"] # Applies to ALL activities regardless of category
+    action_required: "Treat every outdoor-activity inquiry as high severity. Lead directly with the regional weather system warning before any activity-specific guidance."
+    guidance: "A significant low-pressure system/heavy rainfall event is active in your area with substantial precipitation ({precipitation} mm, {precipitation_probability}% rain probability). All non-essential outdoor activities should be suspended or rescheduled. Lead with local meteorological warnings and exercise extreme caution."
+
+  - id: "SOP-SYN-002"
+    title: "Severe Thunderstorm and Lightning Hazard"
+    category: "regional_emergency"
+    severity: "CRITICAL"
+    priority: 95
+    description: "Immediate lightning danger during active thunderstorms."
+    conditions:
+      type: "compound_or"
+      rules:
+        - metric: "weather_code"
+          operator: "in"
+          value: [95, 96, 99] # Thunderstorm, thunderstorm with slight/heavy hail
+    applies_to_activities: ["*"]
+    action_required: "Immediate cessation of all outdoor activities; seek indoor shelter immediately."
+    guidance: "Active thunderstorms and lightning hazards are detected in your area (Weather Code: {weather_code}). Discontinue all outdoor activities immediately and seek fully enclosed shelter. Avoid open fields, elevated areas, tall trees, and metal structures."
+
+  # ----------------------------------------------------------------------------
+  # CATEGORY 2: OUTDOOR EXERCISE & TWO-WHEELER / CYCLING
+  # ----------------------------------------------------------------------------
+  - id: "SOP-EX-001"
+    title: "High Wind Hazard for Cycling and Two-Wheelers"
+    category: "outdoor_exercise"
+    severity: "HIGH"
+    priority: 80
+    description: "Squally winds or severe gusts posing instability risks for bicycles, motorbikes, and scooters."
+    conditions:
+      type: "compound_or"
+      rules:
+        - metric: "wind_speed_10m"
+          operator: ">="
+          value: 40.0
+          unit: "km/h"
+        - metric: "wind_gusts_10m"
+          operator: ">="
+          value: 55.0
+          unit: "km/h"
+    applies_to_activities: ["cycling", "bike", "bicycle", "scooter", "motorcycle", "two-wheeler", "biking", "riding"]
+    action_required: "Flag squally winds as a direct road safety hazard (loss of vehicle stability/flying debris), not merely a comfort issue."
+    guidance: "Wind speeds are currently {wind_speed_10m} km/h (with gusts up to {wind_gusts_10m} km/h). Riding a bicycle or two-wheeler in winds exceeding 40 km/h is a major safety hazard due to loss of balance, sudden crosswind pushes, and reduced vehicle control. Advise choosing enclosed four-wheel transit or postponing the ride."
+
+  - id: "SOP-EX-002"
+    title: "Extreme Solar Radiation and High UV Index"
+    category: "outdoor_exercise"
+    severity: "MODERATE"
+    priority: 60
+    description: "Very high to extreme ultraviolet radiation levels during midday/afternoon hours."
+    conditions:
+      type: "compound_and"
+      rules:
+        - metric: "uv_index"
+          operator: ">="
+          value: 8.0
+          unit: "index"
+    applies_to_activities: ["running", "jogging", "cycling", "hiking", "walking", "outdoor sports", "exercise", "training"]
+    action_required: "Advise against unprotected midday workouts; mandate broad-spectrum sunscreen and UV protection; reschedule to early morning or evening."
+    guidance: "The UV Index is currently elevated at {uv_index} (Very High/Extreme). Unprotected skin and eyes can incur damage rapidly. Advise rescheduling high-intensity outdoor workouts to before 10 AM or after 4 PM. If outdoors, require broad-spectrum SPF 50+ sunscreen, UV-blocking sunglasses, and protective headwear."
+
+  - id: "SOP-EX-003"
+    title: "Extreme Thermal Heat Stress for Strenuous Workouts"
+    category: "outdoor_exercise"
+    severity: "HIGH"
+    priority: 75
+    description: "Elevated ambient or apparent temperatures exceeding safe athletic thresholds."
+    conditions:
+      type: "compound_or"
+      rules:
+        - metric: "temperature_2m"
+          operator: ">="
+          value: 38.0
+          unit: "°C"
+        - metric: "apparent_temperature"
+          operator: ">="
+          value: 42.0
+          unit: "°C"
+    applies_to_activities: ["running", "football", "cricket", "marathon", "athletics", "strenuous exercise", "hiking", "cardio"]
+    action_required: "Warn of heat exhaustion and exertional heat stroke. Advise indoor gym workouts or early dawn sessions with active electrolyte hydration."
+    guidance: "Severe heat stress conditions: Ambient temperature is {temperature_2m}°C (feels like {apparent_temperature}°C). High-intensity cardiovascular workouts outdoors risk heat exhaustion or heat stroke. Recommend shifting workouts to climate-controlled indoor gyms and maintaining electrolyte hydration."
+
+  - id: "SOP-EX-004"
+    title: "Slippery Road Surface and Moderate Rain for Runners & Cyclists"
+    category: "outdoor_exercise"
+    severity: "MODERATE"
+    priority: 50
+    description: "Moderate precipitation causing traction loss and reduced driver visibility."
+    conditions:
+      type: "compound_and"
+      rules:
+        - metric: "precipitation"
+          operator: ">="
+          value: 2.5
+          unit: "mm/h"
+        - metric: "precipitation"
+          operator: "<"
+          value: 20.0
+          unit: "mm/h"
+    applies_to_activities: ["running", "jogging", "cycling", "road biking", "skating"]
+    action_required: "Advise caution regarding braking distance, slick road paint/metal grates, and diminished motorist visibility."
+    guidance: "Active rainfall of {precipitation} mm is creating slick road surfaces and reducing road visibility. If jogging or cycling, reduce speed, beware of slippery lane markings and metal covers, and equip high-visibility reflective gear and front/rear lights."
+
+  - id: "SOP-EX-005"
+    title: "Fair Weather Optimal Exercise & Cycling Conditions"
+    category: "outdoor_exercise"
+    severity: "LOW_ADVISORY"
+    priority: 20
+    description: "Favorable, low-risk conditions for cycling, jogging, and outdoor sports."
+    conditions:
+      type: "compound_and"
+      rules:
+        - metric: "temperature_2m"
+          operator: ">="
+          value: 15.0
+          unit: "°C"
+        - metric: "temperature_2m"
+          operator: "<="
+          value: 32.0
+          unit: "°C"
+        - metric: "wind_speed_10m"
+          operator: "<"
+          value: 25.0
+          unit: "km/h"
+        - metric: "precipitation"
+          operator: "<"
+          value: 1.0
+          unit: "mm/h"
+        - metric: "uv_index"
+          operator: "<"
+          value: 8.0
+          unit: "index"
+    applies_to_activities: ["cycling", "bike", "bicycle", "running", "jogging", "exercise", "outdoor sports", "playground", "park", "kids play", "outdoor play", "walking", "stroll"]
+    action_required: "Confirm conditions are safe and favorable; remind user of baseline hydration and helmet safety."
+    guidance: "Favorable outdoor exercise conditions: Temperature is {temperature_2m}°C, wind is a gentle {wind_speed_10m} km/h, and precipitation is minimal ({precipitation} mm). Conditions are safe for cycling and outdoor workouts. Maintain standard hydration and helmet safety."
+
+  # ----------------------------------------------------------------------------
+  # CATEGORY 3: TRAVEL, COMMUTE & ROAD TRANSIT
+  # ----------------------------------------------------------------------------
+  - id: "SOP-TRV-001"
+    title: "Heavy Precipitation and High Rain Probability Travel Disruption"
+    category: "travel_and_commute"
+    severity: "HIGH"
+    priority: 70
+    description: "High likelihood of rain triggering localized waterlogging and transit delays."
+    conditions:
+      type: "compound_or"
+      rules:
+        - metric: "precipitation_probability"
+          operator: ">="
+          value: 70
+          unit: "%"
+        - metric: "precipitation"
+          operator: ">="
+          value: 10.0
+          unit: "mm/h"
+    applies_to_activities: ["travel", "driving", "commute", "road trip", "flight", "highway", "transit"]
+    action_required: "Warn of commute delays, localized road waterlogging, and advise checking transit route updates before departure."
+    guidance: "Elevated travel alert: Rain probability is {precipitation_probability}% with precipitation measuring {precipitation} mm. Expect commute delays, traffic congestion, and potential localized waterlogging on arterial roads. Recommend verifying route conditions and allowing buffer travel time."
+
+  - id: "SOP-TRV-002"
+    title: "Dense Fog / Low Visibility Travel Hazard"
+    category: "travel_and_commute"
+    severity: "HIGH"
+    priority: 75
+    description: "Foggy conditions impairing driver sightlines and aviation schedules."
+    conditions:
+      type: "compound_or"
+      rules:
+        - metric: "weather_code"
+          operator: "in"
+          value: [45, 48] # Fog and depositing rime fog
+    applies_to_activities: ["driving", "commute", "travel", "highway", "intercity", "flight"]
+    action_required: "Warn of severely reduced stopping distance, instruct use of low-beam fog lights, avoid rapid overtaking."
+    guidance: "Dense fog conditions detected (Weather Code: {weather_code}). Visual range is severely constrained. If driving, maintain double following distance, engage low-beam fog lights (avoid high beams which reflect back), and anticipate flight/train schedule delays."
+
+  # ----------------------------------------------------------------------------
+  # CATEGORY 4: VULNERABLE POPULATIONS (CHILDREN, ELDERLY, PETS)
+  # ----------------------------------------------------------------------------
+  - id: "SOP-VULN-001"
+    title: "Severe Cold Wave and Frost Risk for Elderly and Toddlers"
+    category: "vulnerable_groups"
+    severity: "HIGH"
+    priority: 70
+    description: "Near-freezing temperatures posing hypothermia and respiratory risk for sensitive individuals."
+    conditions:
+      type: "compound_or"
+      rules:
+        - metric: "temperature_2m"
+          operator: "<="
+          value: 8.0
+          unit: "°C"
+        - metric: "apparent_temperature"
+          operator: "<="
+          value: 5.0
+          unit: "°C"
+    applies_to_activities: ["park", "walk", "outdoor play", "stroll", "elderly outing", "toddler outing", "dog walk", "pets"]
+    target_demographics: ["children", "kids", "elderly", "seniors", "pets", "dogs", "infants"]
+    action_required: "Advise against prolonged exposure; mandate multi-layered thermal insulation and protection for extremities."
+    guidance: "Cold wave alert: Ambient temperature is {temperature_2m}°C (wind chill / apparent: {apparent_temperature}°C). Infants, seniors, and short-coated pets lose body heat rapidly. Limit outdoor exposure for children and the elderly, ensure multi-layer thermal clothing, and keep domestic pets warm indoors."
+
+  - id: "SOP-VULN-002"
+    title: "Elevated Heat & Humidity Index for Children's Outdoor Playgrounds"
+    category: "vulnerable_groups"
+    severity: "MODERATE"
+    priority: 65
+    description: "Excessive heat causing playground equipment surface burns and rapid pediatric dehydration."
+    conditions:
+      type: "compound_and"
+      rules:
+        - metric: "temperature_2m"
+          operator: ">="
+          value: 34.0
+          unit: "°C"
+        - metric: "uv_index"
+          operator: ">="
+          value: 6.0
+          unit: "index"
+    applies_to_activities: ["playground", "park", "kids play", "taking kid to the park", "recess", "outdoor play"]
+    target_demographics: ["children", "kids", "toddlers"]
+    action_required: "Warn against scalding metal/plastic slide surfaces, enforce 20-minute water break intervals, keep play in shaded zones."
+    guidance: "Caution for children's outdoor play: Temperature is {temperature_2m}°C with a UV index of {uv_index}. Playground slides and synthetic turf can absorb radiant heat and reach burn-inducing temperatures. Schedule park visits before 10:30 AM or after 5:00 PM, test playground surfaces with your hand first, and enforce frequent water breaks."
+
+  # ----------------------------------------------------------------------------
+  # CATEGORY 5: LEISURE, PICNICS & RECREATION (FUZZY / NON-NUMERIC EVALUATION)
+  # ----------------------------------------------------------------------------
+  - id: "SOP-REC-001"
+    title: "Comprehensive Picnic & Outdoor Gathering Suitability Assessment"
+    category: "leisure_and_recreation"
+    severity: "LOW_ADVISORY"
+    priority: 40
+    description: "Multi-dimensional fuzzy assessment for picnics, lawn gatherings, outdoor dining, and park leisure."
+    conditions:
+      type: "fuzzy_composite"
+      fuzzy_evaluation:
+        ideal_ranges:
+          temperature_2m: [18.0, 29.0] # Comfortable picnic temperature
+          wind_speed_10m: [0.0, 22.0]   # Calm to gentle breeze (napkins won't blow away)
+          precipitation: [0.0, 0.2]     # Dry conditions
+          precipitation_probability: [0, 25] # Low rain threat
+          uv_index: [0.0, 6.5]          # Manageable UV
+        unfavorable_triggers:
+          - "Rain probability > 40% (high chance of damp blankets and wet grass)"
+          - "Wind speed > 25 km/h (food/plates blow away, uncomfortable gusts)"
+          - "Temperature > 33°C (food spoilage risk, heat discomfort)"
+          - "Temperature < 14°C (too chilly for seated outdoor dining without heaters)"
+    applies_to_activities: ["picnic", "park", "lawn gathering", "outdoor lunch", "relaxing in the park", "barbecue", "bbq", "garden party"]
+    action_required: "Provide holistic suitability rating (Ideal, Fair with Precautions, or Poor) evaluating comfort, ground dampness, food safety, and gust conditions."
+    guidance: "Picnic & Leisure Assessment: Current conditions indicate {temperature_2m}°C, wind at {wind_speed_10m} km/h, and {precipitation_probability}% rain probability. Ideal picnic criteria favor mild temperatures (18-29°C), light breeze (<22 km/h), and dry ground. Follow specific advice based on live comfort rating."
+
+  - id: "SOP-REC-002"
+    title: "Light Drizzle / Marginal Weather Casual Stroll Advisory"
+    category: "leisure_and_recreation"
+    severity: "LOW_ADVISORY"
+    priority: 30
+    description: "Mild atmospheric instability suitable for casual walking with minimal rain gear."
+    conditions:
+      type: "compound_and"
+      rules:
+        - metric: "precipitation_probability"
+          operator: ">="
+          value: 30
+          unit: "%"
+        - metric: "precipitation_probability"
+          operator: "<"
+          value: 70
+          unit: "%"
+        - metric: "precipitation"
+          operator: "<"
+          value: 2.0
+          unit: "mm/h"
+    applies_to_activities: ["walking", "stroll", "casual walk", "dog walking", "sightseeing"]
+    action_required: "Inform user that light walk is feasible with a compact umbrella or water-resistant jacket."
+    guidance: "Marginal weather note: Rain probability is moderate at {precipitation_probability}% with slight precipitation potential ({precipitation} mm). Casual walks and short outdoor errands remain viable; advise carrying a compact umbrella or lightweight rain jacket."

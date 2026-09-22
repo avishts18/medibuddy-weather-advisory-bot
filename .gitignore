@@ -1,0 +1,24 @@
+# API Keys & Secrets
+.env
+*.env.local
+
+# Python environment & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# LangSmith & IDE configs
+.langsmith/
+.idea/
+.vscode/
+.DS_Store
+
+# Eval artifacts & logs
+eval_results.json
+logs/
