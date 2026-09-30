@@ -29,6 +29,7 @@ def route_after_extraction(state: AgentState) -> str:
 
     is_greeting = (
         cleaned_query in greetings
+        or any(cleaned_query.startswith(g) for g in ["hi ", "hello ", "hey ", "hii ", "hiii ", "howdy "])
         or any(phrase in cleaned_query for phrase in greeting_phrases)
     )
 

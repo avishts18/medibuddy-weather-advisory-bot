@@ -145,8 +145,9 @@ def greeting_node(state: AgentState) -> Dict[str, Any]:
     """
 
     message = (state.get("user_input") or state.get("user_query") or "").strip().lower()
+    cleaned = "".join(c for c in message if c.isalnum() or c.isspace()).strip()
 
-    if message in ["hi", "hello", "hey", "hii", "hiii"]:
+    if cleaned in ["hi", "hello", "hey", "hii", "hiii"] or any(cleaned.startswith(g) for g in ["hi ", "hello ", "hey ", "hii "]):
         response = "Hello! 👋 How can I help you today?"
 
     elif "good morning" in message:
@@ -165,7 +166,7 @@ def greeting_node(state: AgentState) -> Dict[str, Any]:
         response = "Namaste! 🙏 How can I help you today?"
 
     else:
-        response = "Hello! 👋 How can I help you?"
+        response = "Hello! 👋 How can I help you today?"
 
     return {
         "final_response": response,
