@@ -1,6 +1,6 @@
 # MediBuddy Weather-Advisory Bot — Automated Evaluation Report
 
-> **Generated at:** 2026-09-22 22:23:20  
+> **Generated at:** 2026-09-30 20:41:56  
 > **Summary:** **9/9 Test Cases Passed** (100.0% Pass Rate)
 
 ---
@@ -32,7 +32,7 @@
 
 **Bot Response Snippet:**
 ```text
-**Weather Advisory for Wellington, Wellington Region, New Zealand** *Live Conditions:* **9.1°C** (Feels like 2.8°C), Wind: **33.3 km/h**, Rain: **0.0 mm** (2% p...
+**Weather Advisory for Wellington, Wellington Region, New Zealand** *Live Conditions:* **11.9°C** (Feels like 6.1°C), Wind: **37.2 km/h**, Rain: **0.0 mm** (0% ...
 ```
 
 ---
@@ -46,7 +46,7 @@
 
 **Bot Response Snippet:**
 ```text
-**Weather Advisory for Delhi, National Capital Territory of Delhi, India** *Live Conditions:* **30.5°C** (Feels like 35.9°C), Wind: **2.4 km/h**, Rain: **0.0 mm...
+**Weather Advisory for Delhi, National Capital Territory of Delhi, India** *Live Conditions:* **27.5°C** (Feels like 31.6°C), Wind: **4.4 km/h**, Rain: **0.0 mm...
 ```
 
 ---
@@ -60,7 +60,7 @@
 
 **Bot Response Snippet:**
 ```text
-**Weather Advisory for Bhopal, Madhya Pradesh, India** *Live Conditions:* **24.8°C** (Feels like 28.4°C), Wind: **8.9 km/h**, Rain: **0.0 mm** (12% prob), UV In...
+**Weather Advisory for Bhopal, Madhya Pradesh, India** *Live Conditions:* **25.3°C** (Feels like 27.6°C), Wind: **5.3 km/h**, Rain: **0.0 mm** (0% prob), UV Ind...
 ```
 
 ---
@@ -74,7 +74,7 @@
 
 **Bot Response Snippet:**
 ```text
-**Weather Advisory for Mumbai, Maharashtra, India** *Live Conditions:* **27.6°C** (Feels like 34.2°C), Wind: **2.2 km/h**, Rain: **0.0 mm** (8% prob), UV Index:...
+**Weather Advisory for Mumbai, Maharashtra, India** *Live Conditions:* **29.4°C** (Feels like 34.9°C), Wind: **2.8 km/h**, Rain: **0.0 mm** (2% prob), UV Index:...
 ```
 
 ---
@@ -88,7 +88,7 @@
 
 **Bot Response Snippet:**
 ```text
-**Weather Advisory for Bhopal, Madhya Pradesh, India** *Live Conditions:* **24.8°C** (Feels like 28.4°C), Wind: **8.9 km/h**, Rain: **0.0 mm** (12% prob), UV In...
+**Weather Advisory for Bhopal, Madhya Pradesh, India** *Live Conditions:* **25.3°C** (Feels like 27.6°C), Wind: **5.3 km/h**, Rain: **0.0 mm** (0% prob), UV Ind...
 ```
 
 ---
@@ -144,7 +144,7 @@ Please specify a city or region (for example: *'Is it safe to cycle in Bhopal to
 
 **Bot Response Snippet:**
 ```text
-**Weather Advisory for Bhopal, Madhya Pradesh, India** *Live Conditions:* **24.8°C** (Feels like 28.4°C), Wind: **8.9 km/h**, Rain: **0.0 mm** (12% prob), UV In...
+**Weather Advisory for Bhopal, Madhya Pradesh, India** *Live Conditions:* **25.3°C** (Feels like 27.6°C), Wind: **5.3 km/h**, Rain: **0.0 mm** (0% prob), UV Ind...
 ```
 
 ---

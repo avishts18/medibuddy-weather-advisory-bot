@@ -139,6 +139,40 @@ def extract_entities_node(state: AgentState) -> Dict[str, Any]:
         "execution_trace": trace
     }
 
+def greeting_node(state: AgentState) -> Dict[str, Any]:
+    """
+    Handles simple greetings such as hi, hello, hey, etc.
+    """
+
+    message = (state.get("user_input") or state.get("user_query") or "").strip().lower()
+
+    if message in ["hi", "hello", "hey", "hii", "hiii"]:
+        response = "Hello! 👋 How can I help you today?"
+
+    elif "good morning" in message:
+        response = "Good morning! 🌅 How can I help you today?"
+
+    elif "good afternoon" in message:
+        response = "Good afternoon! 😊 How can I help you today?"
+
+    elif "good evening" in message:
+        response = "Good evening! 🌆 How can I help you today?"
+
+    elif "good night" in message:
+        response = "Good night! 🌙 Have a great day!"
+
+    elif "namaste" in message:
+        response = "Namaste! 🙏 How can I help you today?"
+
+    else:
+        response = "Hello! 👋 How can I help you?"
+
+    return {
+        "final_response": response,
+        "citations": [],
+        "fallback_type": "GREETING",
+        "execution_trace": state.get("execution_trace", []) + ["greeting_node"]
+    }
 
 def fetch_weather_node(state: AgentState) -> Dict[str, Any]:
     """
@@ -390,7 +424,9 @@ def location_fallback_node(state: AgentState) -> Dict[str, Any]:
 
     if loc_name:
         msg = (
+        
             f"I could not resolve the geographic location for **'{loc_name}'** via Open-Meteo geocoding. "
+            
             f"Please specify a valid city or town name so I can fetch live weather data and evaluate safety policies."
         )
     else:

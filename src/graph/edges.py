@@ -11,6 +11,7 @@ def route_after_extraction(state: AgentState) -> str:
     """
     Branch 1: Evaluates parsed user query and context.
     - If adversarial injection attempt -> adversarial_fallback_node
+    - If greeting -> greeting_node
     - If no location specified/inferred -> location_fallback_node
     - If valid location present -> fetch_weather_node
     """
@@ -19,6 +20,21 @@ def route_after_extraction(state: AgentState) -> str:
     if entities.get("is_adversarial", False):
         logger.info("Routing to adversarial_fallback_node")
         return "adversarial_fallback_node"
+
+    # Check for greeting intents when no specific location/activity is queried
+    query = (state.get("user_query") or state.get("user_input") or "").strip().lower()
+    cleaned_query = "".join(c for c in query if c.isalnum() or c.isspace()).strip()
+    greetings = {"hi", "hello", "hey", "hii", "hiii", "namaste", "howdy", "greetings", "sup", "yo"}
+    greeting_phrases = ["good morning", "good afternoon", "good evening", "good night", "namaste"]
+
+    is_greeting = (
+        cleaned_query in greetings
+        or any(phrase in cleaned_query for phrase in greeting_phrases)
+    )
+
+    if is_greeting and not entities.get("location_name") and not entities.get("activity"):
+        logger.info("Routing to greeting_node")
+        return "greeting_node"
 
     if not entities.get("location_name"):
         logger.info("Routing to location_fallback_node (Missing location)")

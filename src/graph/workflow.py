@@ -8,6 +8,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from src.models.state import AgentState
 from src.graph.nodes import (
     extract_entities_node,
+    greeting_node,
     fetch_weather_node,
     match_sop_node,
     generate_advisory_node,
@@ -32,6 +33,7 @@ def create_weather_advisory_graph(checkpointer: Optional[MemorySaver] = None):
 
     # 1. Register Nodes
     workflow.add_node("extract_entities", extract_entities_node)
+    workflow.add_node("greeting", greeting_node)
     workflow.add_node("fetch_weather", fetch_weather_node)
     workflow.add_node("match_sop", match_sop_node)
     workflow.add_node("generate_advisory", generate_advisory_node)
@@ -51,6 +53,7 @@ def create_weather_advisory_graph(checkpointer: Optional[MemorySaver] = None):
         route_after_extraction,
         {
             "adversarial_fallback_node": "adversarial_fallback",
+            "greeting_node": "greeting",
             "location_fallback_node": "location_fallback",
             "fetch_weather_node": "fetch_weather"
         }
@@ -78,6 +81,7 @@ def create_weather_advisory_graph(checkpointer: Optional[MemorySaver] = None):
     )
 
     # Terminal edges
+    workflow.add_edge("greeting", END)
     workflow.add_edge("generate_advisory", END)
     workflow.add_edge("location_fallback", END)
     workflow.add_edge("weather_error_fallback", END)
